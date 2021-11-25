@@ -6,12 +6,14 @@
 /*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/04 15:11:36 by anggonza          #+#    #+#             */
-/*   Updated: 2021/11/09 18:06:08 by anggonza         ###   ########.fr       */
+/*   Updated: 2021/11/15 16:23:49 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#define BUFFER_SIZE 42
+#include <fcntl.h>
+#include <stdio.h>
+#define BUFFER_SIZE 10
 
 static char	*ft_strndup(char *s, int n)
 {
@@ -31,43 +33,83 @@ static char	*ft_strndup(char *s, int n)
 	return (str);
 }
 
-void	ft_fill_rest(char *line, char *rest)
+void	ft_fill_rest(char **line, char *rest)
 {
 	if (rest)
-		ft_strjoin(rest, line);
-	free(rest);
+	{
+		*line = ft_strjoin(*line, rest, 0);
+		rest = NULL;
+		free(rest);
+	}
+	else
+		return ;
 }
 
-char	*return_line(char *line, char *buffer, char *rest, int i)
+char	*return_line(char *line, char *buffer, char **rest, t_vars *v)
 {
-	if (ft_strlen(line) < BUFFER_SIZE * i)
+	if (ft_strlen(line) < BUFFER_SIZE * v->pass)
 	{
-		rest = ft_strndup((buffer + i))
+		//*rest = ft_strndup((buffer + v->i), ft_strlen(buffer) - 1);
+		*rest = NULL;
+		*rest = ft_strjoin(*rest, buffer, 0);
 	}
+	buffer = NULL;
+	free(buffer);
+	return (line);
 }
+
+static char	*ft_fill_temp(int fd, char *buffer, t_vars *v)
+{
+	int		count;
+	char	*tmp;
+
+	v->pass = v->pass + 1;
+	count = read(fd, buffer, BUFFER_SIZE);
+	while (ft_strchr(buffer, '\n') < 0 && count > 0)
+	{
+		v->temp = ft_strjoin(v->temp, buffer, &v->i);
+		count = read(fd, buffer, BUFFER_SIZE);
+		v->pass = v->pass + 1;
+	}
+	tmp = ft_strndup(buffer, ft_strchr(buffer, '\n'));
+	v->temp = ft_strjoin(v->temp, tmp, &v->i);
+	buffer = ft_substr(buffer, ft_strchr(buffer, '\n') + 1, ft_strlen(buffer));
+	free(tmp);
+	return (buffer);
+}
+
 char	*get_next_line(int fd)
 {
-	char		*buffer;
-	static char	*rest;
-	char		*line;
-	int			count;
-	int			i;
+	char		*buffer;//[BUFFER_SIZE + 1];
+	static char	*rest = NULL;
+	t_vars		v;
 
-	line = NULL;
-	i = 0;
-	if (read(fd, buffer, BUFFER_SIZE) < 0 || fd < 0)
+	v.line = NULL;
+	v.temp = NULL;
+	v.i = 0;
+	v.pass = 0;
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (read(fd, buffer, 0) < 0 || fd < 0)
 	{
-		free(buffer);
 		if (rest)
 			free(rest);
 		return (NULL);
 	}
-	ft_fill_rest(line, rest);
-	while (ft_strchr(buffer, '\n') < 0 && count > 0)
-	{
-		ft_strjoin(line, ft_strndup(buffer, ft_strchr(buffer, '\n')));
-		count = read(fd, buffer, BUFFER_SIZE);
-		i += 1;
-	}
-	return (return_line(line, buffer, rest, i));
+	ft_fill_rest(&v.line, rest);
+	buffer = ft_fill_temp(fd, buffer, &v);
+	v.line = ft_strjoin(v.line, v.temp, 0);
+	v.temp = NULL;
+	free(v.temp);
+	return (return_line(v.line, buffer, &rest, &v));
+}
+
+int	main(void)
+{
+	int	fd;
+
+	fd = open("test.txt", O_RDONLY);
+	printf("%s", get_next_line(fd));
+	printf("%s", get_next_line(fd));
+	printf("%s", get_next_line(fd));
+	printf("%s", get_next_line(fd));
 }

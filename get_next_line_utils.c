@@ -6,7 +6,7 @@
 /*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/06 14:02:38 by anggonza          #+#    #+#             */
-/*   Updated: 2021/11/09 17:43:30 by anggonza         ###   ########.fr       */
+/*   Updated: 2021/11/15 15:48:02 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ int	ft_strlen(char *s)
 {
 	int	i;
 
+	if (!s)
+		return (0);
 	i = 0;
 	while (s[i])
 		i++;
@@ -27,7 +29,7 @@ int	ft_strchr(char *s, int c)
 	int	i;
 
 	if ((char)c == '\0')
-		return ((char *)(s + ft_strlen(s)));
+		return (ft_strlen(s));
 	i = 0;
 	while (s[i])
 	{
@@ -38,30 +40,15 @@ int	ft_strchr(char *s, int c)
 	return (-1);
 }
 
-char	*ft_strcpy(char *dest, char *src)
-{
-	int	i;
-
-	i = 0;
-	src = malloc(ft_strlen(dest) + 1);
-	while (src[i] != '\0')
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
-}
-
-char	*ft_strjoin(char *s1, char *s2)
+char	*ft_strjoin(char *s1, char *s2, int *sizefinal)
 {
 	char	*str;
 	size_t	i;
 	size_t	size;
 
-	if (!s1 || !s2)
-		return (NULL);
 	size = ft_strlen(s1) + ft_strlen(s2);
+	if (sizefinal)
+		*sizefinal = size;
 	i = 0;
 	str = malloc(size + 1);
 	if (!str)
@@ -70,7 +57,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	{
 		if (i < size - ft_strlen(s2))
 		{
-			str[i] = *s1++;
+			str[i] = s1[i];
 		}
 		else
 		{
@@ -79,5 +66,33 @@ char	*ft_strjoin(char *s1, char *s2)
 		i++;
 	}
 	str[i] = 0;
+	free(s1);
 	return (str);
+}
+
+char	*ft_substr(char *s, unsigned int start, size_t len)
+{
+	size_t	i;
+	size_t	j;
+	char	*sub;
+
+	i = 0;
+	j = 0;
+	if (!s)
+		return (NULL);
+	if (start > ft_strlen(s))
+		return (strdup(""));
+	if (len > ft_strlen((s + start)))
+		len = ft_strlen((s + start));
+	sub = (char *)malloc(sizeof(char) * len + 1);
+	if (!sub)
+		return (NULL);
+	while (s[i])
+	{
+		if (i >= start && j < len)
+			sub[j++] = s[i];
+		i++;
+	}
+	sub[j] = '\0';
+	return (sub);
 }
