@@ -6,7 +6,7 @@
 /*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/06 14:30:22 by anggonza          #+#    #+#             */
-/*   Updated: 2021/11/15 15:48:10 by anggonza         ###   ########.fr       */
+/*   Updated: 2021/11/30 11:44:47 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 typedef struct s_v
 {
 	int		i;
-	int		pass;
 	char	*temp;
 	char	*line;
 }	t_vars;
@@ -30,6 +29,6 @@ int		ft_strchr(char *s, int c);
 char	*get_next_line(int fd);
 void	ft_fill_line(char *line, char *buffer, int *count);
 void	ft_fill_rest(char **line, char *rest);
-char	*ft_substr(char *s, unsigned int start, size_t len);
+char	*ft_substr(char *s, int start, int len);
 
 #endif

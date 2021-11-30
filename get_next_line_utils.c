@@ -6,7 +6,7 @@
 /*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/06 14:02:38 by anggonza          #+#    #+#             */
-/*   Updated: 2021/11/25 16:37:08 by anggonza         ###   ########.fr       */
+/*   Updated: 2021/11/30 11:51:50 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int	ft_strchr(char *s, int c)
 	while (s[i])
 	{
 		if (s[i] == (char)c)
-			return (i);
+			return (i + 1);
 		i++;
 	}
 	return (-1);
@@ -52,7 +52,10 @@ char	*ft_strjoin(char *s1, char *s2, int *sizefinal)
 	i = 0;
 	str = malloc(size + 1);
 	if (!str)
+	{
+		free(str);
 		return (NULL);
+	}
 	while (i <= size)
 	{
 		if (i < size - ft_strlen(s2))
@@ -70,10 +73,10 @@ char	*ft_strjoin(char *s1, char *s2, int *sizefinal)
 	return (str);
 }
 
-char	*ft_substr(char *s, unsigned int start, size_t len)
+char	*ft_substr(char *s, int start, int len)
 {
-	size_t	i;
-	size_t	j;
+	int		i;
+	int		j;
 	char	*sub;
 
 	i = 0;
@@ -81,12 +84,18 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 	if (!s)
 		return (NULL);
 	if ((int)start > ft_strlen(s))
+	{
+		free(s);
 		return (ft_strjoin(""," ",0));
+	}
 	if ((int)len > ft_strlen((s + start)))
 		len = ft_strlen((s + start));
 	sub = (char *)malloc(sizeof(char) * len + 1);
 	if (!sub)
+	{
+		free(s);
 		return (NULL);
+	}
 	while (s[i])
 	{
 		if (i >= start && j < len)
@@ -94,5 +103,6 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 		i++;
 	}
 	sub[j] = '\0';
+	free(s);
 	return (sub);
 }
